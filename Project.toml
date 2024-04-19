@@ -1,0 +1,13 @@
+name = "BSIM4"
+uuid = "fa7570ea-a14f-11ec-018e-d96f3217f940"
+version = "0.5"
+authors = ["JuliaHub, Inc. and other contributors"]
+
+[deps]
+CedarSim = "9075980a-f0c7-46d2-945a-cc5bead5ad4a"
+RelocatableFolders = "05181044-ff0b-4ac5-8273-598c1e38db00"
+SciMLSensitivity = "1ed8b502-d754-442c-8d5d-10ac956f44a1"
+
+[compat]
+SciMLSensitivity = "7.56.2"
+julia = "1"

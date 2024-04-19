@@ -1,0 +1,23 @@
+BSIM4 PDF issues:
+
+Page 132: "NSD" - "Fatal error if not positive" should be in "Note" column
+Page 140: Duplicate "EPSRSUB", second instance should be "EPSRGATE"
+Page 142: "EU" - Missing Annotation for binnability
+Page 142: "UB" - Typo "secon" -> "second"
+Page 152: "CGDL" - Should be "drain region" rather than "source region"
+Page 153: Channel-length dependence of `VOFFCV` not `VOFFCVL`?
+Page 157: "KF": Missing unit for the `A2-EF` exponent?
+Page 157: "KF": `EF` rather than `EFF` in `s` exponent?
+Page 160/161: Not using `²` superscript like elsewhere in the table
+Page 162: "TNJTSSWG/TNJTSSWGD": Missing `D`  on second NJTSSWG
+Page 163: "PB" not split up into PBS/PBD like the others
+Page 163: Specified `CJSWGD=CJSWS`, but model implements `CJSWGD=CJSWGS`Page 163: Likewise for `MJSWGS`
+Page 163: Likewise for `PBSWGS`
+Page 166: SA/SB/SC Should maybe have units? `m`?
+Page 169: Missing superscripts for exponents in units throughout?
+
+Missing parameters: l, w, ad, as, pd, ps
+
+In the model:
+- GEDL current reverse bias should go in the temperature dependent block to avoid per-instance evaluation
+- The nsub error message says "is not positive" - "is negative" would be more consistent since the check is `< 0.0`
