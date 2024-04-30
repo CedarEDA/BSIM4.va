@@ -1,23 +1,10 @@
 steps:
   - label: "BSIM4 tests"
-    env:
-      GITHUB_SSH_KEY: ${GITHUB_SSH_KEY?}
     plugins:
-      - staticfloat/ssh-agent:
-          keyvars:
-            - "GITHUB_SSH_KEY"
       - JuliaCI/julia#v1:
           version: "https://jc-cedarsim-juliabuilds.s3.amazonaws.com/vanilla/julia-latest-linux-x86_64.tar.gz"
-      # We're not actually running tests here, we just want to make use of this plugin's
-      # ability to add an extra registry for us
       - JuliaCI/julia-test#v1:
-          use_ssh: true
-          run_tests: false
-          extra_registries: ssh://git@github.com/JuliaComputing/CedarEDARegistry.git
-    commands: |
-      cd test
-      julia --project -e 'import Pkg; Pkg.instantiate()'
-      julia --project runtests.jl
+          extra_registries: https://github.com/CedarEDA/PublicRegistry.git
     agents:
       os: "linux"
       arch: "x86_64"
@@ -26,30 +13,18 @@ steps:
 
 
   - label: "BSIM4 tests (Julia nightly)"
-    env:
-      GITHUB_SSH_KEY: ${GITHUB_SSH_KEY?}
     soft_fail: true
     plugins:
-      - staticfloat/ssh-agent:
-          keyvars:
-            - "GITHUB_SSH_KEY"
       - JuliaCI/julia#v1:
           version: nightly
-      # We're not actually running tests here, we just want to make use of this plugin's
-      # ability to add an extra registry for us
       - JuliaCI/julia-test#v1:
-          use_ssh: true
-          run_tests: false
-          extra_registries: ssh://git@github.com/JuliaComputing/CedarEDARegistry.git
-    commands: |
-      cd test
-      julia --project -e 'import Pkg; Pkg.instantiate()'
-      julia --project runtests.jl
+          extra_registries: https://github.com/CedarEDA/PublicRegistry.git
     agents:
       os: "linux"
       arch: "x86_64"
     if: build.message !~ /\[skip tests\]/
     timeout_in_minutes: 120
+
 
   - group: ":arrow_right: Downstream testing"
     notify:
@@ -57,22 +32,16 @@ steps:
           context: "Downstream"
     steps:
       - label: ":runner: CedarSim"
-        env:
-          GITHUB_SSH_KEY: ${GITHUB_SSH_KEY?}
         plugins:
-          - staticfloat/ssh-agent:
-              keyvars:
-                - "GITHUB_SSH_KEY"
           - JuliaCI/julia#v1:
               version: "https://jc-cedarsim-juliabuilds.s3.amazonaws.com/vanilla/julia-latest-linux-x86_64.tar.gz"
           - JuliaCI/julia-test#v1:
-                use_ssh: true
                 run_tests: false
-                extra_registries: ssh://git@github.com/JuliaComputing/CedarEDARegistry.git
+                extra_registries: https://github.com/CedarEDA/PublicRegistry.git
           - staticfloat/metahook:
               pre-command: |
                 echo "--- Clone CedarSim"
-                git clone git@github.com:JuliaComputing/CedarSim.jl.git CedarSim
+                git clone https://github.com/CedarEDA/CedarSim.jl.git CedarSim
 
                 echo "--- Prepare CedarSim to use the current version of all packages for testing"
                 JULIA_PKG_PRECOMPILE_AUTO=0 \
@@ -85,36 +54,27 @@ steps:
         agents:
           os: "linux"
           arch: "x86_64"
-      
-      - label: ":runner: CedarEDA"
-        env:
-          GITHUB_SSH_KEY: ${GITHUB_SSH_KEY?}
-        plugins:
-          - staticfloat/ssh-agent:
-              keyvars:
-                - "GITHUB_SSH_KEY"
-          - JuliaCI/julia#v1:
-              version: "https://jc-cedarsim-juliabuilds.s3.amazonaws.com/vanilla/julia-latest-linux-x86_64.tar.gz"
-          - JuliaCI/julia-test#v1:
-                use_ssh: true
-                run_tests: false
-                extra_registries: ssh://git@github.com/JuliaComputing/CedarEDARegistry.git,ssh://git@github.com/JuliaComputing/JuliaSimRegistry.git
-          - staticfloat/metahook:
-              pre-command: |
-                echo "--- Clone CedarEDA"
-                git clone git@github.com:JuliaComputing/CedarEDA.jl.git CedarEDA
 
-                echo "--- Prepare CedarEDA to use the current version of all packages for testing"
-                JULIA_PKG_PRECOMPILE_AUTO=0 JULIA_PKG_USE_CLI_GIT=true \
-                julia --project=CedarEDA -e 'import Pkg; Pkg.setprotocol!(protocol="ssh"); \
-                                                         Pkg.instantiate(); \
-                                                         Pkg.develop(path="."); \
-                                                         Pkg.precompile();'
-        commands: |
-          cd CedarEDA
-          julia --project=. -e 'import Pkg; Pkg.test()'
-        agents:
-          os: "linux"
-          arch: "x86_64"
+      # - label: ":runner: CedarEDA"
+      #   plugins:
+      #     - JuliaCI/julia#v1:
+      #         version: "https://jc-cedarsim-juliabuilds.s3.amazonaws.com/vanilla/julia-latest-linux-x86_64.tar.gz"
+      #     - JuliaCI/julia-test#v1:
+      #           run_tests: false
+      #           extra_registries: https://github.com/JuliaComputing/CedarEDARegistry.git,ssh://git@github.com/JuliaComputing/JuliaSimRegistry.git
+      #     - staticfloat/metahook:
+      #         pre-command: |
+      #           echo "--- Clone CedarEDA"
+      #           git clone https://github.com/CedarEDA/CedarEDA.jl.git CedarEDA
 
-
+      #           echo "--- Prepare CedarEDA to use the current version of all packages for testing"
+      #           JULIA_PKG_PRECOMPILE_AUTO=0 JULIA_PKG_USE_CLI_GIT=true \
+      #           julia --project=CedarEDA -e 'import Pkg; Pkg.instantiate(); \
+      #                                                    Pkg.develop(path="."); \
+      #                                                    Pkg.precompile();'
+      #   commands: |
+      #     cd CedarEDA
+      #     julia --project=. -e 'import Pkg; Pkg.test()'
+      #   agents:
+      #     os: "linux"
+      #     arch: "x86_64"

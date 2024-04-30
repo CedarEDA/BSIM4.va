@@ -1,7 +1,10 @@
 name = "BSIM4"
 uuid = "fa7570ea-a14f-11ec-018e-d96f3217f940"
-version = "0.5"
+version = "0.5.0"
 authors = ["JuliaHub, Inc. and other contributors"]
+
+[workspace]
+projects = ["test"]
 
 [deps]
 CedarSim = "9075980a-f0c7-46d2-945a-cc5bead5ad4a"
